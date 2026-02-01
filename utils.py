@@ -1,11 +1,10 @@
-import re, sys, math, random, csv, types, networkx as nx
-from collections import defaultdict
+import re, csv, networkx as nx
 
 def parse(filename, isDirected):
     reader = csv.reader(open(filename, 'r'), delimiter=',')
     data = [row for row in reader]
 
-    print "Reading and parsing the data into memory..."
+    print("Reading and parsing the data into memory...")
     if isDirected:
         return parse_directed(data)
     else:
@@ -35,9 +34,9 @@ def parse_directed(data):
 
         DG.add_edge(node_a, node_b)
         if val_a >= val_b:
-            DG.add_path([node_a, node_b])
+            nx.add_path(DG, [node_a, node_b])
         else:
-            DG.add_path([node_b, node_a])
+            nx.add_path(DG, [node_b, node_a])
 
     return DG
 
@@ -52,5 +51,5 @@ def format_key(key):
 
 
 def print_results(f, method, results):
-    print method
+    print(method)
 

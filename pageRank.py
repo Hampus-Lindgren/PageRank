@@ -1,6 +1,5 @@
-import operator
-import math, random, sys, csv 
-from utils import parse, print_results
+import operator, sys
+from utils import parse
 
 class PageRank:
     def __init__(self, graph, directed):
@@ -31,7 +30,7 @@ class PageRank:
                     neighbors = self.graph[key]
                     for n in neighbors:
                         if self.ranks[n] is not None:
-                            outlinks = len(self.graph.neighbors(n))
+                            outlinks = len(list(self.graph.neighbors(n)))
                             rank_sum += (1 / float(outlinks)) * self.ranks[n]
             
                 # actual page rank compution
@@ -41,7 +40,7 @@ class PageRank:
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        print 'Expected input format: python pageRank.py <data_filename> <directed OR undirected>'
+        print('Expected input format: python pageRank.py <data_filename> <directed OR undirected>')
     else:
         filename = sys.argv[1]
         isDirected = False
@@ -52,37 +51,7 @@ if __name__ == '__main__':
         p = PageRank(graph, isDirected)
         p.rank()
 
-        sorted_r = sorted(p.ranks.iteritems(), key=operator.itemgetter(1), reverse=True)
+        sorted_r = sorted(p.ranks.items(), key=operator.itemgetter(1), reverse=True)
 
         for tup in sorted_r:
-            print '{0:30} :{1:10}'.format(str(tup[0]), tup[1])
-
- #       for node in graph.nodes():
- #          print node + rank(graph, node)
-
-            #neighbs = graph.neighbors(node)
-            #print node + " " + str(neighbs)
-            #print random.uniform(0,1)
-
-def rank(graph, node):
-    #V
-    nodes = graph.nodes()
-    #|V|
-    nodes_sz = len(nodes) 
-    #I
-    neighbs = graph.neighbors(node)
-    #d
-    rand_jmp = random.uniform(0, 1)
-
-    ranks = []
-    ranks.append( (1/nodes_sz) )
-    
-    for n in nodes:
-        rank = (1-rand_jmp) * (1/nodes_sz) 
-        trank = 0
-        for nei in neighbs:
-            trank += (1/len(neighbs)) * ranks[len(ranks)-1]
-        rank = rank + (d * trank)
-        ranks.append(rank)
-
- 
+            print('{0:30} :{1:10}'.format(str(tup[0]), tup[1]))
