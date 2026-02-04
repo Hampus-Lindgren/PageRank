@@ -10,6 +10,7 @@ def parse(filename, isDirected):
     else:
         return parse_undirected(data)
 
+#@profile
 def parse_undirected(data):
     G = nx.Graph()
     nodes = set([row[0] for row in data])
@@ -22,17 +23,18 @@ def parse_undirected(data):
 
     return G
 
+#@profile
 def parse_directed(data):
     DG = nx.DiGraph()
 
-    for i, row in enumerate(data):
+    for row in data:
 
         node_a = format_key(row[0])
         node_b = format_key(row[2])
         val_a = digits(row[1])
         val_b = digits(row[3])
 
-        DG.add_edge(node_a, node_b)
+        #DG.add_edge(node_a, node_b) # wtf is the purpose of this line
         if val_a >= val_b:
             nx.add_path(DG, [node_a, node_b])
         else:
@@ -41,7 +43,7 @@ def parse_directed(data):
     return DG
 
 def digits(val):
-    return int(re.sub("\D", "", val))
+    return int(re.sub("\\D", "", val))
 
 def format_key(key):
     key = key.strip() 
