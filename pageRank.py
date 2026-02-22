@@ -20,22 +20,22 @@ class PageRank:
         else:
             self.degrees = dict(self.graph.degree)
     
-    #@profile
+    @profile
     def rank(self):
-        if self.directed:
-            for key, _ in self.graph.nodes(data=True):
-                self.ranks[key] = 1/float(self.V)
-        else:
-            for key, node in self.graph.nodes(data=True):
-                self.ranks[key] = node.get('rank')
+        # it doesn't seem like there's any point in distinguishing between the directed and undirected case here, 
+        # it just takes more time for the same result
+        for key, _ in self.graph.nodes(data=True):
+            self.ranks[key] = 1/float(self.V)
         
         for _ in range(10): # Why does it run 10 times?
             for key, node in self.graph.nodes(data=True):
                 rank_sum = 0
+
                 if self.directed: # Graph is directed
                     for n in self.adjacency[key]:
                         if (outlinks := len(self.adjacency[n])) > 0:
                             rank_sum += self.ranks[n] / outlinks
+
                 else: # Graph is undirected
                     neighbors = self.graph[key]
                     for n in neighbors:
@@ -44,7 +44,7 @@ class PageRank:
                             rank_sum += self.ranks[n] / outlinks
             
                 # actual page rank compution
-                self.ranks[key] = self.const + self.d*rank_sum
+                self.ranks[key] = self.const + self.d * rank_sum
 
         return p
 
@@ -59,9 +59,7 @@ if __name__ == '__main__':
 
         graph = parse(filename, isDirected)
         p = PageRank(graph, isDirected)
-        #cProfile.run('p.rank()', sort="cumtime")
         p.rank()
         sorted_r = sorted(p.ranks.items(), key=operator.itemgetter(1), reverse=True)
-
         for tup in sorted_r:
             print('{0:30} :{1:10}'.format(str(tup[0]), tup[1]))

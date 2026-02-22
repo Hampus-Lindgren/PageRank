@@ -1,38 +1,43 @@
 import re, csv, networkx as nx
+import cython_string
 
+@profile
 def parse(filename, isDirected):
-    reader = csv.reader(open(filename, 'r'), delimiter=',')
-    data = [row for row in reader]
-
-    print("Reading and parsing the data into memory...")
+    with open(filename, 'r') as file:
+        reader = csv.reader(file, delimiter=',')
+        data = [row for row in reader]
+        file.close()
+    #print("Reading and parsing the data into memory...")
     if isDirected:
         return parse_directed(data)
     else:
         return parse_undirected(data)
 
-#@profile
+
+@profile
 def parse_undirected(data):
     G = nx.Graph()
-    nodes = set([row[0] for row in data])
+    #nodes = set([row[0] for row in data])
     edges = [(row[0], row[2]) for row in data]
 
-    num_nodes = len(nodes)
-    rank = 1/float(num_nodes)
-    G.add_nodes_from(nodes, rank=rank)
+    #num_nodes = len(nodes)
+    #rank = 1/float(num_nodes)
+    #G.add_nodes_from(nodes, rank=rank)
     G.add_edges_from(edges)
 
     return G
 
-#@profile
+
+@profile
 def parse_directed(data):
     DG = nx.DiGraph()
 
     for row in data:
 
-        node_a = format_key(row[0])
-        node_b = format_key(row[2])
-        val_a = digits(row[1])
-        val_b = digits(row[3])
+        node_a = cython_string.format_key(row[0])
+        node_b = cython_string.format_key(row[2])
+        val_a = cython_string.digits(row[1])
+        val_b = cython_string.digits(row[3])
 
         #DG.add_edge(node_a, node_b) # wtf is the purpose of this line
         if val_a >= val_b:
@@ -42,10 +47,12 @@ def parse_directed(data):
 
     return DG
 
-def digits(val):
-    return int(re.sub("\\D", "", val))
 
-def format_key(key):
+def digits(val):
+    return int(re.sub(r"\D", "", val))
+
+
+def format_key(key: str):
     key = key.strip() 
     if key.startswith('"') and key.endswith('"'):
         key = key[1:-1]
