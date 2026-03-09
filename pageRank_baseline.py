@@ -1,5 +1,5 @@
-import operator, sys, cProfile, networkx
-from utils import parse
+import operator, sys, cProfile, networkx, timeit
+from utils_original import parse
 
 class PageRank:
     def __init__(self, graph: networkx.Graph, directed: bool):
@@ -14,6 +14,7 @@ class PageRank:
         self.directed = directed
         self.ranks = dict()
     
+    #@profile
     def rank(self):
         for key, node in self.graph.nodes(data=True):
             if self.directed:
@@ -22,6 +23,7 @@ class PageRank:
                 self.ranks[key] = node.get('rank')
 
         for _ in range(10):
+            new_ranks = dict()
             for key, node in self.graph.nodes(data=True):
                 rank_sum = 0
                 curr_rank = node.get('rank')
@@ -39,8 +41,8 @@ class PageRank:
                             rank_sum += (1 / float(outlinks)) * self.ranks[n]
             
                 # actual page rank compution
-                self.ranks[key] = ((1 - float(self.d)) * (1/float(self.V))) + self.d*rank_sum
-
+                new_ranks[key] = ((1 - float(self.d)) * (1/float(self.V))) + self.d*rank_sum
+            self.ranks = new_ranks
         return p
 
 if __name__ == '__main__':
@@ -51,12 +53,16 @@ if __name__ == '__main__':
         isDirected = False
         if sys.argv[2] == 'directed':
             isDirected = True
+        
+        start_time = timeit.default_timer()
 
         graph = parse(filename, isDirected)
         p = PageRank(graph, isDirected)
-        cProfile.run('p.rank()', sort="cumtime")
+        p.rank()
 
         sorted_r = sorted(p.ranks.items(), key=operator.itemgetter(1), reverse=True)
 
+        print(timeit.default_timer() - start_time)
         for tup in sorted_r:
             print('{0:30} :{1:10}'.format(str(tup[0]), tup[1]))
+        
