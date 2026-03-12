@@ -1,5 +1,5 @@
 import operator, sys, cProfile, networkx, timeit
-from utils_original import parse
+from utils_baseline import parse
 
 class PageRank:
     def __init__(self, graph: networkx.Graph, directed: bool):
