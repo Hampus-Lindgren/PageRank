@@ -22,7 +22,8 @@ class PageRank:
             else:
                 self.ranks[key] = node.get('rank')
 
-        for _ in range(10):
+        for i in range(10):
+            print("Iteration", i+1)
             new_ranks = dict()
             for key, node in self.graph.nodes(data=True):
                 rank_sum = 0
@@ -43,7 +44,15 @@ class PageRank:
                 # actual page rank compution
                 new_ranks[key] = ((1 - float(self.d)) * (1/float(self.V))) + self.d*rank_sum
             self.ranks = new_ranks
-        return p
+
+def run(filename, directed):
+    graph = parse(filename, directed)
+    p = PageRank(graph, directed)
+    p.rank()
+
+    sorted_ranks = sorted(p.ranks.items(), key=operator.itemgetter(1), reverse=True)
+
+    return sorted_ranks
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
@@ -54,15 +63,7 @@ if __name__ == '__main__':
         if sys.argv[2] == 'directed':
             isDirected = True
         
-        start_time = timeit.default_timer()
+        sorted_ranks = run(filename, isDirected)
 
-        graph = parse(filename, isDirected)
-        p = PageRank(graph, isDirected)
-        p.rank()
-
-        sorted_r = sorted(p.ranks.items(), key=operator.itemgetter(1), reverse=True)
-
-        print(timeit.default_timer() - start_time)
-        for tup in sorted_r:
+        for tup in sorted_ranks[0:10]:
             print('{0:30} :{1:10}'.format(str(tup[0]), tup[1]))
-        
