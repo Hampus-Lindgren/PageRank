@@ -1,7 +1,9 @@
 import csv
 import cython_string
 from collections import defaultdict
+import cupy as cp
 import numpy as np
+import cupyx.scipy.sparse as csp
 import scipy.sparse as sparse
 #@profile
 def parse(filename: str, is_directed: bool):
@@ -18,7 +20,6 @@ def parse(filename: str, is_directed: bool):
 
     label_to_id: dict[str, int] = {}
     id_to_label: dict[int, str] = {}
-    #adjacency_list: defaultdict[int, list] = defaultdict(list)
     rows: list[int] = []
     cols: list[int] = []
     next_id = [0]
@@ -74,14 +75,14 @@ def parse(filename: str, is_directed: bool):
     #print("Adjacency matrix constructed. Computing outlinks...")
 
 
-    outlinks = np.array(adjacency_matrix.sum(axis=1))
+    outlinks = cp.array(adjacency_matrix.sum(axis=1))
     
-    adjacency_matrix = sparse.csr_matrix(adjacency_matrix)
+    #adjacency_matrix = sparse.csr_matrix(adjacency_matrix)
     #print(adjacency_matrix)
 
     #print("Outlinks computed. Creating sparse matrix...")
 
-    #adjacency_matrix = csp.csr_matrix(adjacency_matrix)
+    adjacency_matrix = csp.csr_matrix(adjacency_matrix)
     #print(adjacency_matrix)
 
     #print("Sparse matrix complete. Initializing graph...")
